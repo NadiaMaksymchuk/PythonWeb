@@ -1,0 +1,53 @@
+.hero {
+  height: 100vh;
+  background: url("../../assets/hero-background.jpg") no-repeat center center/cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero h2 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.hero p {
+  font-size: 20px;
+  margin-bottom: 30px;
+  color: #ddd;
+}
+
+.hero .btn {
+  font-size: 18px;
+}
+
+.hero h2,
+.hero p,
+.hero .btn {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s forwards;
+}
+
+.hero h2 {
+  animation-delay: 0.5s;
+}
+
+.hero p {
+  animation-delay: 1s;
+}
+
+.hero .btn {
+  animation-delay: 1.5s;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
