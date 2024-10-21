@@ -1,0 +1,45 @@
+.contact-section {
+  padding: 80px 20px;
+  background-color: #1a1a1a;
+  text-align: center;
+}
+
+.contact-section h2 {
+  font-size: 36px;
+  margin-bottom: 40px;
+  color: #1e90ff;
+}
+
+.contact-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+
+.contact-item {
+  max-width: 300px;
+}
+
+.contact-item h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.contact-item p,
+.contact-item a {
+  font-size: 18px;
+  color: #ccc;
+}
+
+.social-links a {
+  margin: 0 10px;
+  color: #1e90ff;
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+  color: #3742fa;
+}

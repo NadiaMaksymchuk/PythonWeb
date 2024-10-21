@@ -1,0 +1,39 @@
+.slide-menu {
+  position: fixed;
+  top: 0;
+  right: -250px;
+  width: 250px;
+  height: 100%;
+  background-color: #111;
+  padding-top: 60px;
+  transition: right 0.3s ease;
+  z-index: 999;
+}
+
+.slide-menu.open {
+  right: 0;
+}
+
+.slide-menu ul {
+  list-style: none;
+  padding: 0;
+}
+
+.slide-menu ul li {
+  padding: 15px 20px;
+}
+
+.slide-menu ul li a {
+  color: #fff;
+  font-size: 18px;
+  display: block;
+  transition: background 0.3s ease;
+}
+
+.slide-menu ul li a:hover {
+  background-color: #1e90ff;
+}
+
+.slide-menu {
+  transition: right 0.3s ease;
+}
