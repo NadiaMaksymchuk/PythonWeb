@@ -1,15 +1,18 @@
-header {
+nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #000;
   color: #fff;
   padding: 10px 20px;
+  position: relative;
 }
 
 nav ul {
   list-style: none;
   display: flex;
+  margin-left: auto;
+  padding: 0;
 }
 
 nav ul li {
@@ -33,7 +36,23 @@ nav ul li a {
 @media (max-width: 768px) {
   nav ul {
     display: none;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    background-color: #000;
   }
+
+  nav ul.show {
+    display: flex;
+  }
+
+  nav ul li {
+    margin: 10px 0;
+    text-align: center;
+  }
+
   .menu-button {
     display: block;
   }

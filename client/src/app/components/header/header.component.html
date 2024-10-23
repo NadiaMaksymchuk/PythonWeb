@@ -1,13 +1,15 @@
-<header>
-  <div class="logo">
-    <h1>SCP Foundation</h1>
-  </div>
-  <nav>
-    <ul>
-      <li><a href="#home">Головна</a></li>
-      <li><a href="#about">Про нас</a></li>
-      <li><a href="#contact">Контакти</a></li>
-    </ul>
-  </nav>
-  <button class="menu-button" (click)="toggleMenu()">☰</button>
-</header>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="/">SCP Foundation</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
+    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <ul class="navbar-nav ms-auto">
+    <li class="nav-item" *ngIf="!isLoggedIn">
+      <a class="nav-link" routerLink="/user-login">Увійти</a>
+    </li>
+    <li class="nav-item" *ngIf="isLoggedIn">
+      <a class="nav-link" (click)="logout()">Вийти</a>
+    </li>
+  </ul>  
+</nav>
