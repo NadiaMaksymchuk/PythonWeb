@@ -1,0 +1,9 @@
+<div class="home-user" *ngIf="adminEmail; else errorTemplate">
+  <h1>Welcome admin, {{ adminEmail }}!</h1>
+</div>
+
+<ng-template #errorTemplate>
+  <div class="error-message" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+</ng-template>
