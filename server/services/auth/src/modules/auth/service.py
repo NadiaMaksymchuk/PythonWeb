@@ -2,14 +2,19 @@ from uuid import UUID
 from datetime import datetime, timedelta, UTC
 
 from jose import jwt
+from jwt import PyJWTError
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from server.services.auth.src.modules.core.schemas import TokenData
 from src.common import constants, dependencies
 from src.modules.auth import schemas
 from src.models.users import User, UserRepository
-
+from datetime import datetime, timedelta
+from typing import Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 class AuthService:
 
@@ -52,6 +57,18 @@ class AuthService:
             },
             status_code=200
         )
+    
+    def decode_access_token(token: str) -> Optional[TokenData]:
+        try:
+            payload = jwt.decode(token, constants.SECRET_KEY, algorithms=[constants.ALGORITHM])
+            user_id: str = payload.get("sub")
+            role: str = payload.get("role")
+            if user_id is None or role is None:
+                return None
+            token_data = TokenData(user_id=user_id, role=role)
+            return token_data
+        except PyJWTError:
+            return None
 
     async def _get_user_by_email(self, db: AsyncSession, email: str) -> User:
         user = await UserRepository.get_one_by_email(db, email)
