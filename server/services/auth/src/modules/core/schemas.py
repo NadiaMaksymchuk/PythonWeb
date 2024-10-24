@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, UUID4, ConfigDict, Field
 from uuid import UUID
 from enum import Enum
 from datetime import datetime
@@ -27,6 +27,7 @@ class OccupancyStatus(str, Enum):
 
 # StorageRoom Schemas
 class StorageRoomBase(BaseModel):
+    id: UUID4
     room_type: str
     location: str
     occupancy_status: OccupancyStatus = OccupancyStatus.empty
@@ -35,27 +36,39 @@ class StorageRoomBase(BaseModel):
 class StorageRoomCreate(StorageRoomBase):
     pass
 
-class StorageRoom(StorageRoomBase):
-    id: UUID
+class StorageRoomDto(StorageRoomBase):
+    id: UUID4
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
 
-# StoredItem Schemas
-class StoredItemBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+class StoredItemCreate(BaseModel):
     name: str
     classification: str
     description: Optional[str] = None
     storageroom_id: UUID
 
-class StoredItemCreate(StoredItemBase):
-    pass
+class StoredItemUpdate(BaseModel):
+    name: Optional[str] = None
+    classification: Optional[str] = None
+    description: Optional[str] = None
+    storageroom_id: Optional[UUID] = None
 
-class StoredItem(StoredItemBase):
+class StoredItemDto(BaseModel):
     id: UUID
+    name: str
+    classification: str
+    description: Optional[str] = None
+    storageroom_id: UUID
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+class StorageRoomUpdate(BaseModel):
+    room_type: Optional[str] = None
+    location: Optional[int] = None
+    
 
 # User Schemas
 class UserBase(BaseModel):
@@ -80,6 +93,8 @@ class ScheduleBase(BaseModel):
     storageroom_id: UUID
     user_id: UUID
 
+    model_config = ConfigDict(from_attributes=True)
+
 class ScheduleCreate(ScheduleBase):
     pass
 
@@ -89,21 +104,24 @@ class Schedule(ScheduleBase):
     class Config:
         orm_mode = True
 
-# SecurityEvent Schemas
 class SecurityEventBase(BaseModel):
     event_type: SecurityEventType
     description: Optional[str] = None
-    datetime: datetime
-    user_id: UUID
 
 class SecurityEventCreate(SecurityEventBase):
-    pass
+    stored_item_id: UUID4  # Mandatory for creation
 
-class SecurityEvent(SecurityEventBase):
+class SecurityEventUpdate(BaseModel):
+    event_type: Optional[SecurityEventType] = None
+    description: Optional[str] = None
+    stored_item_id: Optional[UUID4] = None
+
+class SecurityEventDto(SecurityEventBase):
     id: UUID
+    datetime: str  # ISO formatted datetime
+    user_id: UUID
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 # Authentication Schemas
 class Token(BaseModel):
@@ -111,8 +129,7 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    user_id: Optional[UUID] = None
-    role: Optional[UserRole] = None
+    user_id: UUID = None
 
 class UserLogin(BaseModel):
     email: EmailStr

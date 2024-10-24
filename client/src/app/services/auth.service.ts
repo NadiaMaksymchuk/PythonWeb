@@ -33,7 +33,7 @@ export class AuthService {
       this.loggedIn.next(!!accessToken);
       if (accessToken) {
         const payload = this.parseJwt(accessToken);
-        this.userRole = payload?.role || null;
+        //this.userRole = payload?.role || null;
         this.scheduleTokenRefresh();
       }
     }
@@ -157,7 +157,7 @@ export class AuthService {
     this.unscheduleTokenRefresh();
 
     // Set the interval to 10 minutes (600,000 milliseconds)
-    this.refreshSubscription = interval(600000).subscribe(() => {
+    this.refreshSubscription = interval(400000).subscribe(() => {
       this.refreshAccessToken().subscribe({
         next: () => {
           console.log('Token refreshed successfully');
