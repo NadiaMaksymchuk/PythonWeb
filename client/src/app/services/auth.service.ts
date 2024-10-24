@@ -10,7 +10,7 @@ interface LoginResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private authUrl = 'http://localhost:8001';
@@ -18,7 +18,8 @@ export class AuthService {
   public isLoggedIn = this.loggedIn.asObservable();
   public userRole: string | null = null;
   private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+  private refreshTokenSubject: BehaviorSubject<string | null> =
+    new BehaviorSubject<string | null>(null);
   private readonly ACCESS_TOKEN_KEY = 'access_token';
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   refreshSubscription: any;
@@ -44,9 +45,10 @@ export class AuthService {
   }
 
   login(credentials: any): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.authUrl}/auth/admin/login`, credentials)
+    return this.http
+      .post<LoginResponse>(`${this.authUrl}/auth/admin/login`, credentials)
       .pipe(
-        tap(response => {
+        tap((response) => {
           if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('access_token', response.access);
             this.loggedIn.next(true);
@@ -57,9 +59,10 @@ export class AuthService {
   }
 
   userLogin(credentials: any): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.authUrl}/auth/customer/login`, credentials)
+    return this.http
+      .post<LoginResponse>(`${this.authUrl}/auth/customer/login`, credentials)
       .pipe(
-        tap(response => {
+        tap((response) => {
           if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('access_token', response.access);
             this.loggedIn.next(true);
@@ -85,17 +88,23 @@ export class AuthService {
   }
 
   adminAuth(): Observable<any> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.getToken()}`);
-    return this.http.get<any>(`${this.authUrl}/auth/admin`, { headers }).pipe(
-      map(response => response.email)
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${this.getToken()}`
     );
+    return this.http
+      .get<any>(`${this.authUrl}/auth/admin`, { headers })
+      .pipe(map((response) => response.email));
   }
 
   customerAuth(): Observable<any> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.getToken()}`);
-    return this.http.get<any>(`${this.authUrl}/auth/customer`, { headers }).pipe(
-      map(response => response.email)
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${this.getToken()}`
     );
+    return this.http
+      .get<any>(`${this.authUrl}/auth/customer`, { headers })
+      .pipe(map((response) => response.email));
   }
 
   getRefreshToken(): string | null {
@@ -127,19 +136,39 @@ export class AuthService {
 
     const body = { refresh: refreshToken };
     const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     });
 
-    return this.http.post<LoginResponse>(`${this.authUrl}/auth/refresh`, body, { headers }).pipe(
-      tap(response => {
-        this.storeTokens(response.access);
-      }),
-      catchError(error => {
-        console.error('Refresh token failed:', error);
-        this.logout();
-        return throwError(error);
-      })
-    );
+    return this.http
+      .post<LoginResponse>(`${this.authUrl}/auth/refresh`, body, { headers })
+      .pipe(
+        tap((response) => {
+          this.storeTokens(response.access);
+        }),
+        catchError((error) => {
+          console.error('Refresh token failed:', error);
+          this.logout();
+          return throwError(error);
+        })
+      );
+  }
+
+  getIsAdminFromToken(): boolean | null {
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
+    }
+
+    const accessToken = localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    if (!accessToken) {
+      return null;
+    }
+
+    const payload = this.parseJwt(accessToken);
+    if (payload && typeof payload.isAdmin === 'boolean') {
+      return payload.isAdmin;
+    }
+
+    return null;
   }
 
   // Helper method to store tokens
@@ -164,7 +193,7 @@ export class AuthService {
         },
         error: (err) => {
           console.error('Failed to refresh token:', err);
-        }
+        },
       });
     });
   }
@@ -183,7 +212,11 @@ export class AuthService {
     if (error.error instanceof ErrorEvent) {
       // Client-side/network error
       errorMessage = `Error: ${error.error.message}`;
-    } else if (error.error && error.error.detail && error.error.detail.message) {
+    } else if (
+      error.error &&
+      error.error.detail &&
+      error.error.detail.message
+    ) {
       // Backend error message
       errorMessage = error.error.detail.message;
     } else if (error.message) {

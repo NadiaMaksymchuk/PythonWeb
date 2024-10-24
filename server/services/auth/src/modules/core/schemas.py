@@ -33,8 +33,11 @@ class StorageRoomBase(BaseModel):
     occupancy_status: OccupancyStatus = OccupancyStatus.empty
     description: Optional[str] = None
 
-class StorageRoomCreate(StorageRoomBase):
-    pass
+class StorageRoomCreate(BaseModel):
+    room_type: str
+    location: str
+    occupancy_status: OccupancyStatus = OccupancyStatus.empty
+    description: Optional[str] = None
 
 class StorageRoomDto(StorageRoomBase):
     id: UUID4
