@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, shareReplay } from 'rxjs/operators';
 import { StorageRoom } from '../models/storage-room.model';
 
 @Injectable({
@@ -10,19 +10,23 @@ import { StorageRoom } from '../models/storage-room.model';
 })
 export class StorageRoomService {
   private apiUrl = 'http://localhost:8001/storagerooms';
+  private storageRoomCache = new Map<string, Observable<StorageRoom>>();
 
   constructor(private http: HttpClient) {}
 
-  getStorageRooms(): Observable<StorageRoom[]> {
+  getAllStorageRooms(): Observable<StorageRoom[]> {
+    const url = `${this.apiUrl}/`;
     return this.http
-      .get<StorageRoom[]>(this.apiUrl)
-      .pipe(catchError(this.handleError));
+      .get<StorageRoom[]>(url)
+      .pipe(catchError(this.handleError), shareReplay(1));
   }
 
   getStorageRoomById(id: string): Observable<StorageRoom> {
-    return this.http
+    const storageRoom$ = this.http
       .get<StorageRoom>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+      .pipe(catchError(this.handleError), shareReplay(1));
+    this.storageRoomCache.set(id, storageRoom$);
+    return storageRoom$;
   }
 
   createStorageRoom(

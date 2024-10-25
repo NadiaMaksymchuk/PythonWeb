@@ -63,7 +63,7 @@ export class HomeAdminComponent implements OnInit {
   }
 
   loadStorageRooms(): void {
-    this.storageRoomService.getStorageRooms().subscribe({
+    this.storageRoomService.getAllStorageRooms().subscribe({
       next: (data) => {
         this.storageRooms = data;
       },

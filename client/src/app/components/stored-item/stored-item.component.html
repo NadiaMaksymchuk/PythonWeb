@@ -1,0 +1,204 @@
+<div class="container my-5">
+  <h2 class="mb-4 text-center">Manage Stored Items</h2>
+
+  <!-- Display Errors -->
+  <div
+    *ngIf="error"
+    class="alert alert-danger alert-dismissible fade show"
+    role="alert"
+  >
+    {{ error }}
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="error = ''"
+    ></button>
+  </div>
+
+  <!-- Stored Item Form -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0">
+        {{ isEditMode ? "Edit Stored Item" : "Add New Stored Item" }}
+      </h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="storedItemForm" (ngSubmit)="onSubmit()">
+        <!-- Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label"
+            >Name <span class="text-danger">*</span></label
+          >
+          <input
+            id="name"
+            type="text"
+            class="form-control"
+            formControlName="name"
+            placeholder="Enter name"
+          />
+          <div
+            *ngIf="
+              storedItemForm.get('name')?.invalid &&
+              storedItemForm.get('name')?.touched
+            "
+            class="form-text text-danger"
+          >
+            Name is required.
+          </div>
+        </div>
+
+        <!-- Classification -->
+        <div class="mb-3">
+          <label for="classification" class="form-label"
+            >Classification <span class="text-danger">*</span></label
+          >
+          <input
+            id="classification"
+            type="text"
+            class="form-control"
+            formControlName="classification"
+            placeholder="Enter classification"
+          />
+          <div
+            *ngIf="
+              storedItemForm.get('classification')?.invalid &&
+              storedItemForm.get('classification')?.touched
+            "
+            class="form-text text-danger"
+          >
+            Classification is required.
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            id="description"
+            class="form-control"
+            formControlName="description"
+            rows="3"
+            placeholder="Enter description"
+          ></textarea>
+        </div>
+
+        <!-- Storage Room Selection -->
+        <div class="mb-3">
+          <label for="storageroom_id" class="form-label"
+            >Storage Room <span class="text-danger">*</span></label
+          >
+          <select
+            id="storageroom_id"
+            class="form-select"
+            formControlName="storageroom_id"
+          >
+            <option value="" disabled>Select storage room</option>
+            <option *ngFor="let room of storageRooms" [value]="room.id">
+              {{ room.room_type }} - {{ room.location }}
+            </option>
+          </select>
+          <div
+            *ngIf="
+              storedItemForm.get('storageroom_id')?.invalid &&
+              storedItemForm.get('storageroom_id')?.touched
+            "
+            class="form-text text-danger"
+          >
+            Storage Room is required.
+          </div>
+        </div>
+
+        <!-- Form Buttons -->
+        <div class="d-flex justify-content-between">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="storedItemForm.invalid"
+          >
+            {{ isEditMode ? "Update" : "Add" }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+            *ngIf="isEditMode"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Stored Items List -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Stored Items List</h5>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Classification</th>
+            <th>Description</th>
+            <th>Room Type</th>
+            <th>Location</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of storedItems">
+            <td>{{ item.name }}</td>
+            <td>{{ item.classification }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.storageRoom?.room_type }}</td>
+            <td>{{ item.storageRoom?.location }}</td>
+            <td class="text-center">
+              <button
+                class="btn btn-sm btn-info me-2"
+                (click)="editStoredItem(item)"
+              >
+                <i class="bi bi-pencil-square"></i> Edit
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteStoredItem(item)"
+              >
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="storedItems.length === 0">
+            <td colspan="6" class="text-center">No stored items available.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div
+      id="liveToast"
+      class="toast align-items-center text-white"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      *ngIf="showSuccessToast"
+    >
+      <div class="d-flex">
+        <div class="toast-body">
+          {{ toastMessage }}
+        </div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          aria-label="Close"
+          (click)="showSuccessToast = false"
+        ></button>
+      </div>
+    </div>
+  </div>
+</div>
