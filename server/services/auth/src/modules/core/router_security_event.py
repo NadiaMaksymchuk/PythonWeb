@@ -50,9 +50,6 @@ async def update_security_event(
     db: AsyncSession = Depends(get_postgres),
     current_user: User = Depends(AuthService.get_current_active_user)
 ):
-    # Restrict updates to admins only
-    if not current_user.is_admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     updated_event = await crud_security_event.update_security_event(db, security_event_id, security_event_update)
     if not updated_event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="SecurityEvent not found")
@@ -65,9 +62,6 @@ async def delete_security_event(
     db: AsyncSession = Depends(get_postgres),
     current_user: User = Depends(AuthService.get_current_active_user)
 ):
-    # Restrict deletions to admins only
-    if not current_user.is_admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     deleted_event = await crud_security_event.delete_security_event(db, security_event_id)
     if not deleted_event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="SecurityEvent not found")

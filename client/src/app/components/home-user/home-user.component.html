@@ -8,3 +8,211 @@
   </div>
 </ng-template>
 
+<div class="container my-5">
+  <h2 class="mb-4 text-center">Manage Security Events</h2>
+
+  <!-- Display Errors -->
+  <div
+    *ngIf="error"
+    class="alert alert-danger alert-dismissible fade show"
+    role="alert"
+  >
+    {{ error }}
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="error = ''"
+    ></button>
+  </div>
+
+  <div class="row">
+    <!-- Security Events List -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Security Events List</h5>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Event Type</th>
+                <th>Description</th>
+                <th>Stored Item Name</th>
+                <th>Classification</th>
+                <th>Date & Time</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let event of securityEvents">
+                <td>
+                  <span
+                    [ngClass]="{
+                      'badge bg-warning text-dark':
+                        event.event_type === 'intrusion',
+                      'badge bg-info text-dark': event.event_type === 'anomaly',
+                      'badge bg-danger':
+                        event.event_type === 'equipment_failure'
+                    }"
+                  >
+                    {{ event.event_type }}
+                  </span>
+                </td>
+                <td>{{ event.description }}</td>
+                <td>{{ event.storedItemName }}</td>
+                <td>{{ event.storedItemClassification }}</td>
+                <td>{{ event.datetime | date : "short" }}</td>
+                <td class="text-center">
+                  <button
+                    class="btn btn-sm btn-info me-2"
+                    (click)="editSecurityEvent(event)"
+                  >
+                    <i class="bi bi-pencil-square"></i> Edit
+                  </button>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    (click)="deleteSecurityEvent(event)"
+                  >
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="securityEvents.length === 0">
+                <td colspan="7" class="text-center">
+                  No security events available.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Event Form -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            {{ isEditMode ? "Edit Security Event" : "Add New Security Event" }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="securityEventForm" (ngSubmit)="onSubmit()">
+            <!-- Event Type -->
+            <div class="mb-3">
+              <label for="event_type" class="form-label"
+                >Event Type <span class="text-danger">*</span></label
+              >
+              <select
+                id="event_type"
+                class="form-select"
+                formControlName="event_type"
+              >
+                <option value="" disabled>Select event type</option>
+                <option *ngFor="let type of securityEventTypes" [value]="type">
+                  {{ type | titlecase }}
+                </option>
+              </select>
+              <div
+                *ngIf="
+                  securityEventForm.get('event_type')?.invalid &&
+                  securityEventForm.get('event_type')?.touched
+                "
+                class="form-text text-danger"
+              >
+                Event Type is required.
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea
+                id="description"
+                class="form-control"
+                formControlName="description"
+                rows="3"
+                placeholder="Enter description"
+              ></textarea>
+            </div>
+
+            <!-- Stored Item Selection -->
+            <div class="mb-3">
+              <label for="stored_item_id" class="form-label">
+                Stored Item <span class="text-danger">*</span>
+              </label>
+              <select
+                id="stored_item_id"
+                class="form-select"
+                formControlName="stored_item_id"
+              >
+                <option value="" disabled>Select stored item</option>
+                <option
+                  *ngFor="let storedItem of storedItemsList"
+                  [value]="storedItem.id"
+                >
+                  {{ storedItem.name || "Unnamed Item" }}
+                </option>
+              </select>
+              <div
+                *ngIf="
+                  securityEventForm.get('stored_item_id')?.invalid &&
+                  securityEventForm.get('stored_item_id')?.touched
+                "
+                class="form-text text-danger"
+              >
+                Stored Item is required.
+              </div>
+            </div>
+
+            <!-- Form Buttons -->
+            <div class="d-flex justify-content-between">
+              <button
+                type="submit"
+                class="btn btn-success"
+                [disabled]="securityEventForm.invalid"
+              >
+                {{ isEditMode ? "Update" : "Add" }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="resetForm()"
+                *ngIf="isEditMode"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div
+      id="liveToast"
+      class="toast align-items-center text-white"
+      [ngClass]="toastBgColor"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      *ngIf="showSuccessToast"
+    >
+      <div class="d-flex">
+        <div class="toast-body">
+          {{ toastMessage }}
+        </div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          aria-label="Close"
+          (click)="showSuccessToast = false"
+        ></button>
+      </div>
+    </div>
+  </div>
+</div>

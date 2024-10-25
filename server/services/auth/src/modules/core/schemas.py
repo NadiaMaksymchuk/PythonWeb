@@ -70,8 +70,9 @@ class StoredItemDto(BaseModel):
 
 class StorageRoomUpdate(BaseModel):
     room_type: Optional[str] = None
-    location: Optional[int] = None
-    
+    location: Optional[str] = None
+    occupancy_status: Optional[OccupancyStatus] = None
+    description: Optional[str] = None
 
 # User Schemas
 class UserBase(BaseModel):

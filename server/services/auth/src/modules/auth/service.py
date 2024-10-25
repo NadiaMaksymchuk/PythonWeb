@@ -55,7 +55,7 @@ class AuthService:
         user = await self._get_user_by_uuid(db, uuid)
         return JSONResponse(
             content={
-                "access": self._create_access_token(user.uuid, user.is_admin)
+                "access": self._create_access_token(user.uuid)
             },
             status_code=200
         )
@@ -101,7 +101,7 @@ class AuthService:
     def _verify_password(self, password: str, hashed_pass: str) -> bool:
         return password == hashed_pass
 
-    def _create_access_token(self, sub: any, is_admin: bool) -> str:
+    def _create_access_token(self, sub: any) -> str:
         return self.__generate_jwt_token(sub, datetime.now() + timedelta(
             minutes=constants.ACCESS_TOKEN_EXPIRE_MINUTES
         ))
@@ -111,12 +111,11 @@ class AuthService:
             minutes=constants.REFRESH_TOKEN_EXPIRE_MINUTES
         ))
 
-    def __generate_jwt_token(self, sub: any, expires_delta: datetime, is_admin: bool) -> str:
+    def __generate_jwt_token(self, sub: any, expires_delta: datetime) -> str:
         return jwt.encode(
             claims={
                 "exp": expires_delta,
-                "sub": str(sub),
-                "isAdmin": is_admin},
+                "sub": str(sub)},
             key=constants.SECRET_KEY,
             algorithm=constants.ALGORITHM
         )
