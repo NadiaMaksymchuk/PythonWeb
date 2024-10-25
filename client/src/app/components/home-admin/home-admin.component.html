@@ -7,3 +7,205 @@
     <p>{{ errorMessage }}</p>
   </div>
 </ng-template>
+
+<div class="container my-5">
+  <h2 class="mb-4 text-center">Manage Storage Rooms</h2>
+
+  <!-- Display Errors -->
+  <div
+    *ngIf="error"
+    class="alert alert-danger alert-dismissible fade show"
+    role="alert"
+  >
+    {{ error }}
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="error = ''"
+    ></button>
+  </div>
+
+  <div class="row">
+    <!-- Storage Rooms List -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Storage Rooms List</h5>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Room Type</th>
+                <th>Location</th>
+                <th>Occupancy Status</th>
+                <th>Description</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let room of storageRooms">
+                <td>{{ room.room_type }}</td>
+                <td>{{ room.location }}</td>
+                <td>
+                  <span
+                    [ngClass]="{
+                      'badge bg-success': room.occupancy_status === 'full',
+                      'badge bg-warning text-dark':
+                        room.occupancy_status === 'partially_filled',
+                      'badge bg-secondary': room.occupancy_status === 'empty'
+                    }"
+                  >
+                    {{ room.occupancy_status | titlecase }}
+                  </span>
+                </td>
+                <td>{{ room.description }}</td>
+                <td class="text-center">
+                  <button
+                    class="btn btn-sm btn-info me-2"
+                    (click)="editStorageRoom(room)"
+                  >
+                    <i class="bi bi-pencil-square"></i> Edit
+                  </button>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    (click)="deleteStorageRoom(room)"
+                  >
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="storageRooms.length === 0">
+                <td colspan="5" class="text-center">
+                  No storage rooms available.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Storage Room Form -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            {{ isEditMode ? "Edit Storage Room" : "Add New Storage Room" }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="storageRoomForm" (ngSubmit)="onSubmit()">
+            <!-- Room Type -->
+            <div class="mb-3">
+              <label for="room_type" class="form-label"
+                >Room Type <span class="text-danger">*</span></label
+              >
+              <input
+                id="room_type"
+                type="text"
+                class="form-control"
+                formControlName="room_type"
+                placeholder="Enter room type"
+              />
+              <div
+                *ngIf="
+                  storageRoomForm.get('room_type')?.invalid &&
+                  storageRoomForm.get('room_type')?.touched
+                "
+                class="form-text text-danger"
+              >
+                Room Type is required.
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-3">
+              <label for="location" class="form-label"
+                >Location <span class="text-danger">*</span></label
+              >
+              <input
+                id="location"
+                type="text"
+                class="form-control"
+                formControlName="location"
+                placeholder="Enter location"
+              />
+              <div
+                *ngIf="
+                  storageRoomForm.get('location')?.invalid &&
+                  storageRoomForm.get('location')?.touched
+                "
+                class="form-text text-danger"
+              >
+                Location is required.
+              </div>
+            </div>
+
+            <!-- Occupancy Status -->
+            <div class="mb-3">
+              <label for="occupancy_status" class="form-label"
+                >Occupancy Status <span class="text-danger">*</span></label
+              >
+              <select
+                id="occupancy_status"
+                class="form-select"
+                formControlName="occupancy_status"
+              >
+                <option
+                  *ngFor="let status of occupancyStatuses"
+                  [value]="status"
+                >
+                  {{ status | titlecase }}
+                </option>
+              </select>
+              <div
+                *ngIf="
+                  storageRoomForm.get('occupancy_status')?.invalid &&
+                  storageRoomForm.get('occupancy_status')?.touched
+                "
+                class="form-text text-danger"
+              >
+                Occupancy Status is required.
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea
+                id="description"
+                class="form-control"
+                formControlName="description"
+                rows="3"
+                placeholder="Enter description"
+              ></textarea>
+            </div>
+
+            <!-- Form Buttons -->
+            <div class="d-flex justify-content-between">
+              <button
+                type="submit"
+                class="btn btn-success"
+                [disabled]="storageRoomForm.invalid"
+              >
+                {{ isEditMode ? "Update" : "Add" }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="resetForm()"
+                *ngIf="isEditMode"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a class="nav-link" routerLink="/stored-items">Manage Stored Items -></a>
